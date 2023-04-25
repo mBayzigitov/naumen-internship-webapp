@@ -6,9 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.naumen.naumeninternshipwebapp.model.Person;
 import ru.naumen.naumeninternshipwebapp.repository.PersonRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
