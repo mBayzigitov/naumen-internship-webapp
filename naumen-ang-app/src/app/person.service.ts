@@ -8,11 +8,20 @@ import {Person} from "./person";
 })
 export class PersonService {
 
-  private baseURL = "http://localhost:8080/api/v1/people";
+  status = '';
+  private baseURL = "http://localhost:8080/api/v1/";
 
   constructor(private httpClient: HttpClient) { }
 
   getPeopleList(): Observable<Person[]> {
-    return this.httpClient.get<Person[]>(`${this.baseURL}`);
+    return this.httpClient.get<Person[]>(this.baseURL + "people");
+  }
+
+  clearPeopleList() {
+    this.httpClient.delete(this.baseURL + "clear", {responseType: "text"}).subscribe(
+      status => {
+        this.status = status;
+      }
+    );
   }
 }
