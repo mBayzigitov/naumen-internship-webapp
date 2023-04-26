@@ -6,4 +6,5 @@ import ru.naumen.naumeninternshipwebapp.model.Person;
 
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Long> {
+    public Person getPersonByName(String name);
 }
