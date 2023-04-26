@@ -2,17 +2,12 @@ package ru.naumen.naumeninternshipwebapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.naumen.naumeninternshipwebapp.model.Person;
 import ru.naumen.naumeninternshipwebapp.repository.PersonRepository;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -37,7 +32,7 @@ public class PersonController {
     }
 
     @PostMapping("/file-uploading")
-    public String recieveFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public String recieveFile(@RequestParam("file") MultipartFile file) {
         Scanner scanner = null;
         Pattern pattern = Pattern.compile("(^|\s+)([A-ZА-ЯЁ][a-zа-яё]+)_([1-9]+)($|\s+)");
         int counter = 0;
@@ -50,32 +45,38 @@ public class PersonController {
             return "Error occured while uploading a file";
         }
 
-        while (scanner.hasNextLine()) {
-            String curLine = scanner.nextLine();
+        try {
+            while (scanner.hasNextLine()) {
+                String curLine = scanner.nextLine();
 
-            Matcher matcher = pattern.matcher(curLine);
-            while (matcher.find()) {
-                String name = matcher.group(2);
-                String age = matcher.group(3);
+                Matcher matcher = pattern.matcher(curLine);
+                while (matcher.find()) {
+                    String name = matcher.group(2);
+                    String age = matcher.group(3);
 
-                int numericAge;
-                try {
-                    numericAge = Integer.parseInt(age);
-                } catch (NumberFormatException nfe) {
-                    continue;
-                }
+                    int numericAge;
+                    try {
+                        numericAge = Integer.parseInt(age);
+                    } catch (NumberFormatException nfe) {
+                        continue;
+                    }
 
-                Person person = new Person(name, numericAge);
+                    Person person = new Person(name, numericAge);
 
-                try {
-                    personRepository.save(person);
-                    counter++;
-                } catch (DataIntegrityViolationException e) {
-                    areThereAnyExistedNames = true;
-                    existedNames.add(person.getName());
+                    // exception in case when such record already exists
+                    try {
+                        personRepository.save(person);
+                        counter++;
+                    } catch (DataIntegrityViolationException e) {
+                        areThereAnyExistedNames = true;
+                        existedNames.add(person.getName());
+                    }
                 }
             }
+        } catch (Exception exc) {
+            return "Upload interrupted because of error";
         }
+
 
         if (counter == 0) return "Either entries of [Name]_[age] type were not found in the file,\n" +
                 "or all of records provided already exist, 0 lines added";
@@ -85,6 +86,16 @@ public class PersonController {
                         "\nNames that weren't added, because they already exist: " +
                         existedNames :
                 "File is uploaded successfully, " + counter + " lines added";
+    }
+
+    @GetMapping("/getPerson/{name}")
+    public Person getPerson(@PathVariable String name) {
+        return personRepository.getPersonByName(name);
+    }
+
+    @DeleteMapping("/clear")
+    public void clearPeopleList() {
+        personRepository.deleteAll();
     }
 
 }
