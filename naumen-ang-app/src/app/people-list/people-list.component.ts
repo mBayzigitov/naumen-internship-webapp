@@ -23,4 +23,11 @@ export class PeopleListComponent {
       this.people = data;
     })
   }
+
+  clear() {
+    if (confirm("Вы действительно хотите удалить все записи?")) {
+      this.personService.clearPeopleList();
+      this.getPeople();
+    }
+  }
 }
