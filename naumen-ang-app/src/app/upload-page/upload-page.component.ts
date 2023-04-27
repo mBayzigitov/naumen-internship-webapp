@@ -8,29 +8,30 @@ import {FileUploadService} from "../file-upload.service";
 })
 export class UploadPageComponent implements OnInit {
 
-  // Variable to store shortLink from api response
-  text: string = null;
-  loading: boolean = false; // Flag variable
-  file: File = null; // Variable to store file
+  message: string = null;
+  error: string = null;
+  loading: boolean = false;
+  file: File = null;
 
-  // Inject service
   constructor(private fileUploadService: FileUploadService) { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  // On file Select
   onChange(event) {
-    // @ts-ignore
     this.file = event.target.files[0];
   }
 
-  // OnClick of button Upload
   onUpload() {
     this.loading = true;
     this.fileUploadService.upload(this.file).subscribe(
-      (result) => {
-        this.text = result;
+      (response) => {
+        this.message = response;
+        this.error = null;
+        this.loading = false;
+      },
+      (error) => {
+        this.error = error.error;
+        this.message = null;
         this.loading = false;
       }
     );

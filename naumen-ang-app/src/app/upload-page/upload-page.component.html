@@ -4,17 +4,19 @@
 
   <button (click)="onUpload()"
           class="btn btn-success">
-    Upload
+    Загрузить
   </button>
 </div>
 
-<!-- Shareable short link of uploaded file -->
 <div class="container text-center jumbotron"
-     *ngIf="text">
-  <p>{{text}}</p>
+     *ngIf="message" style="color: mediumseagreen">
+  <p>{{message}}</p>
 </div>
 
-<!--Flag variable is used here-->
+<div class="container text-center error" *ngIf="error" style="color: red">
+  <p>{{error}}</p>
+</div>
+
 <div class="container" *ngIf="loading">
-  <h3>Loading ...</h3>
+  <h3>Загрузка...</h3>
 </div>

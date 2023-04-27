@@ -2,6 +2,8 @@ package ru.naumen.naumeninternshipwebapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.naumen.naumeninternshipwebapp.model.Person;
@@ -31,17 +33,15 @@ public class PersonController {
     }
 
     @PostMapping("/file-uploading")
-    public String recieveFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> recieveFile(@RequestParam("file") MultipartFile file) {
         Scanner scanner = null;
         Pattern pattern = Pattern.compile("(^|\s+)([A-ZА-ЯЁ][a-zа-яё]+)_([1-9]+)($|\s+)");
         int counter = 0;
-        boolean areThereAnyExistedNames = false;
-        List<String> ignoredNames = new ArrayList<>();
 
         try {
             scanner = new Scanner(file.getInputStream());
         } catch (Exception exc) {
-            return "Ошибка, файл не был загружен";
+            return new ResponseEntity<>("Ошибка, файл не был загружен", HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -57,7 +57,6 @@ public class PersonController {
                     try {
                         numericAge = Integer.parseInt(age);
                         if (numericAge < 1 || numericAge > 120) {
-                            ignoredNames.add(name);
                             continue;
                         }
                     } catch (NumberFormatException nfe) {
@@ -71,23 +70,17 @@ public class PersonController {
                         personRepository.save(person);
                         counter++;
                     } catch (DataIntegrityViolationException e) {
-                        areThereAnyExistedNames = true;
-                        ignoredNames.add(person.getName());
+                        continue;
                     }
                 }
             }
         } catch (Exception exc) {
-            return "Ошибка, файл не был загружен";
+            return new ResponseEntity<>("Ошибка, файл не был загружен", HttpStatus.NOT_FOUND);
         }
 
-        if (counter == 0) return "В файле не найдены записи типа [Имя]_[возраст] " +
-                ", либо записи не удовлетворяют условиям, добавлено 0 строк";
-
-        return (areThereAnyExistedNames) ?
-                "Файл загружен успешно, " + counter + " записей добавлено." +
-                        "\nИмена, которые не были добавлены: " +
-                        ignoredNames :
-                "Файл загружен успешно, " + counter + " записей добавлено.";
+        return (counter == 0) ?
+                new ResponseEntity<>("Ни одной записи не добавлено, проверьте условия ввода данных", HttpStatus.OK) :
+                new ResponseEntity<>(counter + " записей добавлено", HttpStatus.OK);
     }
 
     @GetMapping("/getPerson/{name}")
