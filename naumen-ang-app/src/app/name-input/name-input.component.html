@@ -1,6 +1,8 @@
 <form (submit)="onSubmit()">
   <input [(ngModel)]="inputName" name="name-field" type="text" class="form-control"  placeholder="Введите имя">
-  <button type="submit" class="btn btn-default">Click me!</button>
+  <button type="submit" class="btn btn-default">Узнать возраст / Добавить запись</button>
 </form>
 
 <h2 *ngIf="flag"> {{response}} </h2>
+
+<h2 class="error" *ngIf="error" style="color: red">{{error}}</h2>

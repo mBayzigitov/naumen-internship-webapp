@@ -13,6 +13,7 @@ export class NameInputComponent {
   flag: boolean = false;
   inputName = '';
   response = '';
+  error: string = null;
 
   constructor(private nameInputService: NameInputService) {}
 
@@ -21,7 +22,7 @@ export class NameInputComponent {
 
   onSubmit() {
     this.nameInputService.getPerson(this.inputName).subscribe(
-      person => {
+      (person) => {
         if (person == null) {
           this.flag = true;
           this.response = "No such name found";
@@ -30,6 +31,12 @@ export class NameInputComponent {
           this.recievedPerson = person;
           this.response = this.recievedPerson.age.toString();
         }
+      },
+      (error) => {
+        this.error = error.error;
+        this.response = '';
+        this.recievedPerson = null;
+        this.flag = false;
       }
     );
   }

@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.homyakin.iuliia.Schemas;
 import ru.homyakin.iuliia.Translator;
+import ru.naumen.naumeninternshipwebapp.exception.NamePatternException;
 import ru.naumen.naumeninternshipwebapp.model.Person;
 import ru.naumen.naumeninternshipwebapp.repository.PersonRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,12 +89,29 @@ public class PersonController {
 
     @GetMapping("/getPerson/{name}")
     public Person getPerson(@PathVariable String name) {
-        return personRepository.getPersonByName(name);
+        name = name.trim();
+        String namePattern = "([A-ZА-ЯЁ][a-zа-яё]+)";
+
+        System.out.println(name + "; " + name.matches(namePattern));
+
+        if (!name.matches(namePattern)) {
+            throw new NamePatternException();
+        }
+
+        Optional<Person> person = personRepository.getPersonByName(name);
+//        System.out.println(person.get().getName());
+
+        return person.orElse(null);
     }
 
     @DeleteMapping("/clear")
     public void clearPeopleList() {
         personRepository.deleteAll();
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<String> handleInvalidNamePattern(NamePatternException npe) {
+        return new ResponseEntity<>("Invalid name pattern", HttpStatus.NOT_FOUND);
     }
 
 }
