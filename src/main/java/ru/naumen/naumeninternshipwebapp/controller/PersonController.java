@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.naumen.naumeninternshipwebapp.model.Person;
 import ru.naumen.naumeninternshipwebapp.repository.PersonRepository;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -37,12 +36,12 @@ public class PersonController {
         Pattern pattern = Pattern.compile("(^|\s+)([A-ZА-ЯЁ][a-zа-яё]+)_([1-9]+)($|\s+)");
         int counter = 0;
         boolean areThereAnyExistedNames = false;
-        List<String> existedNames = new ArrayList<>();
+        List<String> ignoredNames = new ArrayList<>();
 
         try {
             scanner = new Scanner(file.getInputStream());
         } catch (Exception exc) {
-            return "Error occured while uploading a file";
+            return "Ошибка, файл не был загружен";
         }
 
         try {
@@ -57,6 +56,10 @@ public class PersonController {
                     int numericAge;
                     try {
                         numericAge = Integer.parseInt(age);
+                        if (numericAge < 1 || numericAge > 120) {
+                            ignoredNames.add(name);
+                            continue;
+                        }
                     } catch (NumberFormatException nfe) {
                         continue;
                     }
@@ -69,23 +72,22 @@ public class PersonController {
                         counter++;
                     } catch (DataIntegrityViolationException e) {
                         areThereAnyExistedNames = true;
-                        existedNames.add(person.getName());
+                        ignoredNames.add(person.getName());
                     }
                 }
             }
         } catch (Exception exc) {
-            return "Upload interrupted because of error";
+            return "Ошибка, файл не был загружен";
         }
 
-
-        if (counter == 0) return "Either entries of [Name]_[age] type were not found in the file,\n" +
-                "or all of records provided already exist, 0 lines added";
+        if (counter == 0) return "В файле не найдены записи типа [Имя]_[возраст] " +
+                ", либо записи не удовлетворяют условиям, добавлено 0 строк";
 
         return (areThereAnyExistedNames) ?
-                "File is uploaded successfully, " + counter + " lines added." +
-                        "\nNames that weren't added, because they already exist: " +
-                        existedNames :
-                "File is uploaded successfully, " + counter + " lines added";
+                "Файл загружен успешно, " + counter + " записей добавлено." +
+                        "\nИмена, которые не были добавлены: " +
+                        ignoredNames :
+                "Файл загружен успешно, " + counter + " записей добавлено.";
     }
 
     @GetMapping("/getPerson/{name}")
