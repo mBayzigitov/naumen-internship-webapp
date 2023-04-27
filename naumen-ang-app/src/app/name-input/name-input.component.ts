@@ -21,16 +21,19 @@ export class NameInputComponent {
   }
 
   onSubmit() {
+    if (this.inputName.length == 0) {
+      this.error = 'Пожалуйста, не оставляйте поле пустым';
+      return;
+    }
+
+    this.inputName = this.inputName.replace(/[^a-zа-яA-ZА-ЯёЁ 0-9]/g, '')
+
     this.nameInputService.getPerson(this.inputName).subscribe(
       (person) => {
-        if (person == null) {
-          this.flag = true;
-          this.response = "No such name found";
-        } else {
-          this.flag = true;
-          this.recievedPerson = person;
-          this.response = this.recievedPerson.age.toString();
-        }
+        this.error = '';
+        this.flag = true;
+        this.recievedPerson = person;
+        this.response = this.recievedPerson.age.toString();
       },
       (error) => {
         this.error = error.error;

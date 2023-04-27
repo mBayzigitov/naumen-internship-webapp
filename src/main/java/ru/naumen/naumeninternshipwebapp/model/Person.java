@@ -28,6 +28,12 @@ public class Person {
         this.age = age;
     }
 
+    public Person(String name, int age, long count) {
+        this.name = name;
+        this.age = age;
+        this.count = count;
+    }
+
     public long getId() {
         return id;
     }

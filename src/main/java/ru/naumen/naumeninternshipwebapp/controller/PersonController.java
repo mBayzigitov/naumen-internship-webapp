@@ -5,6 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.homyakin.iuliia.Schemas;
 import ru.homyakin.iuliia.Translator;
@@ -99,7 +100,26 @@ public class PersonController {
         }
 
         Optional<Person> person = personRepository.getPersonByName(name);
-//        System.out.println(person.get().getName());
+
+        if (person.isEmpty()) {
+            int newPerson_age;
+            RestTemplate restTemplate = new RestTemplate();
+
+            // using api.agify.io interface
+            String url = "https://api.agify.io/?name=" + translator.translate(name);
+            Person new_person = restTemplate.getForObject(url, Person.class);
+
+            if (new_person == null || new_person.getAge() == 0) {
+                new_person = new Person(name,
+                        (int) ((Math.random() * (120 - 1)) + 1),0);
+            }
+
+            new_person.setName(name);
+            new_person.setCount(0);
+
+            personRepository.save(new_person);
+            return new_person;
+        }
 
         return person.orElse(null);
     }
