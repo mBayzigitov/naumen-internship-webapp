@@ -42,6 +42,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/ru.homyakin/iuliia-java -->
+        <dependency>
+            <groupId>ru.homyakin</groupId>
+            <artifactId>iuliia-java</artifactId>
+            <version>1.8</version>
+        </dependency>
     </dependencies>
 
     <build>

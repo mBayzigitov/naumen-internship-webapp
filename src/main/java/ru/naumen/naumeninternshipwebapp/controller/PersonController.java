@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.homyakin.iuliia.Schemas;
+import ru.homyakin.iuliia.Translator;
 import ru.naumen.naumeninternshipwebapp.model.Person;
 import ru.naumen.naumeninternshipwebapp.repository.PersonRepository;
 
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
 public class PersonController {
 
     private PersonRepository personRepository;
+    private final Translator translator = new Translator(Schemas.ICAO_DOC_9303);
 
     @Autowired
     public PersonController(PersonRepository personRepository) {
