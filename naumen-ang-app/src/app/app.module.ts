@@ -8,13 +8,15 @@ import {HttpClientModule} from "@angular/common/http";
 import { UploadPageComponent } from './upload-page/upload-page.component';
 import { NameInputComponent } from './name-input/name-input.component';
 import {FormsModule} from "@angular/forms";
+import { StatsComponent } from './stats/stats.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PeopleListComponent,
     UploadPageComponent,
-    NameInputComponent
+    NameInputComponent,
+    StatsComponent
   ],
     imports: [
         BrowserModule,
