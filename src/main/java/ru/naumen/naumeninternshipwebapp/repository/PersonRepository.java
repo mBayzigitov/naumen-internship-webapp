@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.naumen.naumeninternshipwebapp.model.Person;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +19,10 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             nativeQuery = true
     )
     public Integer getRequestsAmount();
+
+    @Query(
+            value = "select * from Person where count != 0 order by count desc",
+            nativeQuery = true
+    )
+    public List<Person> getAllWhereCountNotZero();
 }

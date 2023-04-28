@@ -15,9 +15,9 @@ import ru.naumen.naumeninternshipwebapp.exception.NamePatternException;
 import ru.naumen.naumeninternshipwebapp.model.Person;
 import ru.naumen.naumeninternshipwebapp.repository.PersonRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -144,6 +144,34 @@ public class PersonController {
 
         return (amount == null) ?
                 0 : amount;
+    }
+
+    @GetMapping("freq")
+    public ResponseEntity<Object> getFrequency() {
+        List<Person> people = personRepository.getAllWhereCountNotZero();
+        Integer numberOfRequests = personRepository.getRequestsAmount();
+
+        List<Map<String, String>> data = new ArrayList<>();
+
+        try {
+            if (people.isEmpty() || numberOfRequests == null) return new ResponseEntity<>(data, HttpStatus.OK);
+
+            for (int i = 0; i < people.size(); i++) {
+                data.add(new HashMap<>());
+                data.get(i).put("name", people.get(i).getName());
+                data.get(i).put("amount", Integer.toString(people.get(i).getCount()));
+
+                double freqValue = (double)people.get(i).getCount() / (double)numberOfRequests * 100.00;
+                NumberFormat formatter = new DecimalFormat("#0.00");
+
+                data.get(i).put("freq", formatter.format(freqValue));
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return new ResponseEntity<>("Error occured", HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
     @ExceptionHandler
