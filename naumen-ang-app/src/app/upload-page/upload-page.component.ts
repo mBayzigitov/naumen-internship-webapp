@@ -22,7 +22,15 @@ export class UploadPageComponent implements OnInit {
   }
 
   onUpload() {
+    if (this.file == null) {
+      this.message = '';
+      this.loading = false;
+      this.error = 'Файл не выбран';
+      return;
+    }
     this.loading = true;
+    this.error = '';
+    this.message = '';
     this.fileUploadService.upload(this.file).subscribe(
       (response) => {
         this.message = response;
