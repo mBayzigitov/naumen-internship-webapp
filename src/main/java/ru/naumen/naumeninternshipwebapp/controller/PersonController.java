@@ -138,6 +138,14 @@ public class PersonController {
         personRepository.deleteAll();
     }
 
+    @GetMapping("req-amount")
+    public int getRequestsAmount() {
+        Integer amount = personRepository.getRequestsAmount();
+
+        return (amount == null) ?
+                0 : amount;
+    }
+
     @ExceptionHandler
     private ResponseEntity<String> handleInvalidNamePattern(NamePatternException npe) {
         return new ResponseEntity<>("Invalid name pattern", HttpStatus.NOT_FOUND);

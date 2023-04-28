@@ -8,7 +8,7 @@ public class Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
 
     @Column(name = "name", unique = true)
     private String name;
@@ -17,7 +17,7 @@ public class Person {
     private int age;
 
     @Column(name = "count")
-    private long count = 0;
+    private int count = 0;
 
     public Person() {
 
@@ -28,17 +28,17 @@ public class Person {
         this.age = age;
     }
 
-    public Person(String name, int age, long count) {
+    public Person(String name, int age, int count) {
         this.name = name;
         this.age = age;
         this.count = count;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -58,11 +58,11 @@ public class Person {
         this.age = age;
     }
 
-    public long getCount() {
+    public int getCount() {
         return count;
     }
 
-    public void setCount(long count) {
+    public void setCount(int count) {
         this.count = count;
     }
 }
