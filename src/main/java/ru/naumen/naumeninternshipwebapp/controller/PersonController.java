@@ -115,11 +115,15 @@ public class PersonController {
             }
 
             new_person.setName(name);
-            new_person.setCount(0);
+            new_person.setCount(1);
 
             personRepository.save(new_person);
             return new_person;
         }
+
+        // incrementing person's count value inside Optional
+        person.get().setCount(person.get().getCount() + 1);
+        personRepository.save(person.get());
 
         return person.orElse(null);
     }
