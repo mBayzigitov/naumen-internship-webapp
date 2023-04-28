@@ -17,7 +17,7 @@ public class Person {
     private int age;
 
     @Column(name = "count")
-    private long count;
+    private long count = 0;
 
     public Person() {
 
