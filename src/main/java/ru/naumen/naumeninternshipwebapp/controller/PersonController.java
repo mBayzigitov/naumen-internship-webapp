@@ -5,6 +5,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.homyakin.iuliia.Schemas;
@@ -93,8 +95,6 @@ public class PersonController {
         name = name.trim();
         String namePattern = "([A-ZА-ЯЁ][a-zа-яё]+)";
 
-        System.out.println(name + "; " + name.matches(namePattern));
-
         if (!name.matches(namePattern)) {
             throw new NamePatternException();
         }
@@ -107,11 +107,16 @@ public class PersonController {
 
             // using api.agify.io interface
             String url = "https://api.agify.io/?name=" + translator.translate(name);
-            Person new_person = restTemplate.getForObject(url, Person.class);
+            Person new_person = null;
+
+            try {
+                new_person = restTemplate.getForObject(url, Person.class);
+            } catch (HttpClientErrorException | HttpServerErrorException httpClientOrServerExc) {
+                new_person = createPersonWithRandomAgeValue(name);
+            }
 
             if (new_person == null || new_person.getAge() == 0) {
-                new_person = new Person(name,
-                        (int) ((Math.random() * (120 - 1)) + 1),0);
+                new_person = createPersonWithRandomAgeValue(name);
             }
 
             new_person.setName(name);
@@ -136,6 +141,11 @@ public class PersonController {
     @ExceptionHandler
     private ResponseEntity<String> handleInvalidNamePattern(NamePatternException npe) {
         return new ResponseEntity<>("Invalid name pattern", HttpStatus.NOT_FOUND);
+    }
+
+    private static Person createPersonWithRandomAgeValue(String name) {
+        return new Person(name,
+                (int) ((Math.random() * (120 - 1)) + 1)); // creating random age value between 1 and 120
     }
 
 }
