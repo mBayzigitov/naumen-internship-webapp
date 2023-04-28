@@ -2,6 +2,7 @@ package ru.naumen.naumeninternshipwebapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -154,7 +155,9 @@ public class PersonController {
         List<Map<String, String>> data = new ArrayList<>();
 
         try {
-            if (people.isEmpty() || numberOfRequests == null) return new ResponseEntity<>(data, HttpStatus.OK);
+            if (people.isEmpty()
+                    || numberOfRequests == null
+                    || numberOfRequests == 0) return new ResponseEntity<>(data, HttpStatus.OK);
 
             for (int i = 0; i < people.size(); i++) {
                 data.add(new HashMap<>());
@@ -172,6 +175,11 @@ public class PersonController {
         }
 
         return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
+    @GetMapping("oldest")
+    public Person getOldestPerson() {
+        return personRepository.findTopByOrderByAgeDesc().orElse(null);
     }
 
     @ExceptionHandler

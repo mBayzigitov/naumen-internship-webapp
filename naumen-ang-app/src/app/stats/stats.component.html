@@ -1,20 +1,22 @@
 <h1>Статистика</h1>
 
-<h3 *ngIf="requestsAmount != null">Всего запросов: {{requestsAmount}}</h3>
+<h3 *ngIf="oldest">1. Имя человека с наибольшим возрастом: {{oldest.name}}</h3>
+<h3 *ngIf="!oldest">1. Пока что не добавлено ни одного человека</h3>
 
-<!--<table class="table table-striped">-->
-<!--  <thead>-->
-<!--  <tr>-->
-<!--    <th> Имя </th>-->
-<!--    <th> Количество запросов </th>-->
-<!--    <th> Частотность в разрезе имён </th>-->
-<!--  </tr>-->
-<!--  </thead>-->
-<!--  <tbody>-->
-<!--  <tr *ngFor = "let person of people">-->
-<!--    <td> {{ person.name }} </td>-->
-<!--    <td> {{ person.age }} </td>-->
-<!--    <td> {{ person.age }} </td>-->
-<!--  </tr>-->
-<!--  </tbody>-->
-<!--</table>-->
+<h3 *ngIf="requestsAmount != null">2. Всего запросов: {{requestsAmount}}</h3>
+<table class="table table-striped" *ngIf="peopleStat">
+  <thead>
+  <tr>
+    <th> Имя </th>
+    <th> Количество запросов </th>
+    <th> Частотность в разрезе имён, % </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor = "let person of peopleStat">
+    <td> {{ person.name }} </td>
+    <td> {{ person.amount }} </td>
+    <td> {{ person.freq }} </td>
+  </tr>
+  </tbody>
+</table>
