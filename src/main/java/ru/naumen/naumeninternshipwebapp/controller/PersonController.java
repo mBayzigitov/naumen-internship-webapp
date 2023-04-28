@@ -34,7 +34,7 @@ public class PersonController {
 
     @GetMapping("/people")
     public List<Person> addPerson() {
-        return personRepository.findAll();
+        return personRepository.findAllByOrderByName();
     }
 
     @PostMapping("/file-uploading")
