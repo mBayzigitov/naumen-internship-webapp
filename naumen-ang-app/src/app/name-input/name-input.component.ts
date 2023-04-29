@@ -21,8 +21,11 @@ export class NameInputComponent {
   }
 
   onSubmit() {
+    this.error = '';
+    this.response = '';
+
     if (this.inputName.length == 0) {
-      this.error = 'Пожалуйста, не оставляйте поле пустым';
+      this.error = 'Имя не введено, заполните поле';
       return;
     }
 

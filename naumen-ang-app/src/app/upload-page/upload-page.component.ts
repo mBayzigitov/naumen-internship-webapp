@@ -10,7 +10,6 @@ export class UploadPageComponent implements OnInit {
 
   message: string = null;
   error: string = null;
-  loading: boolean = false;
   file: File = null;
 
   constructor(private fileUploadService: FileUploadService) { }
@@ -22,25 +21,21 @@ export class UploadPageComponent implements OnInit {
   }
 
   onUpload() {
+    this.message = 'Загрузка...';
     if (this.file == null) {
       this.message = '';
-      this.loading = false;
       this.error = 'Файл не выбран';
       return;
     }
-    this.loading = true;
     this.error = '';
-    this.message = '';
     this.fileUploadService.upload(this.file).subscribe(
       (response) => {
         this.message = response;
         this.error = null;
-        this.loading = false;
       },
       (error) => {
         this.error = error.error;
         this.message = null;
-        this.loading = false;
       }
     );
   }

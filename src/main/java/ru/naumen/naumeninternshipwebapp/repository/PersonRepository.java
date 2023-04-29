@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface PersonRepository extends JpaRepository<Person, Long> {
     public Optional<Person> getPersonByName(String name);
 
+    public List<Person> findAllByOrderByCountDesc();
+
     public List<Person> findAllByOrderByName();
 
     @Query(
@@ -20,12 +22,6 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             nativeQuery = true
     )
     public Integer getRequestsAmount();
-
-    @Query(
-            value = "select * from Person where count != 0 order by count desc",
-            nativeQuery = true
-    )
-    public List<Person> getAllWhereCountNotZero();
 
     public Optional<Person> findTopByOrderByAgeDesc();
 }

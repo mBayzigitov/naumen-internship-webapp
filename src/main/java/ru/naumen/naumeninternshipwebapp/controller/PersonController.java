@@ -149,7 +149,7 @@ public class PersonController {
 
     @GetMapping("freq")
     public ResponseEntity<Object> getFrequency() {
-        List<Person> people = personRepository.getAllWhereCountNotZero();
+        List<Person> people = personRepository.findAllByOrderByCountDesc();
         Integer numberOfRequests = personRepository.getRequestsAmount();
 
         List<Map<String, String>> data = new ArrayList<>();
@@ -184,7 +184,7 @@ public class PersonController {
 
     @ExceptionHandler
     private ResponseEntity<String> handleInvalidNamePattern(NamePatternException npe) {
-        return new ResponseEntity<>("Invalid name pattern", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Неверный формат ввода, введите имя одним словом с заглавной буквы кириллицей или латиницей", HttpStatus.NOT_FOUND);
     }
 
     private static Person createPersonWithRandomAgeValue(String name) {
