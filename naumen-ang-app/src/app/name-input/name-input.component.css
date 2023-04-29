@@ -1,0 +1,59 @@
+h1 {
+  font-size: 26px;
+  margin-top: 5%;
+}
+
+form {
+  margin-top: 4%;
+  margin-left: 40%;
+}
+
+input {
+  width: 250px;
+}
+
+p {
+  margin-top: 3%;
+  font-size: 17px;
+  color: #969696;
+}
+
+ol {
+  width: 400px;
+  margin-left: 34.9%;
+  margin-top: -1%;
+  font-size: 14px;
+  color: #5c5b5b;
+}
+
+button {
+  margin-top: 1%;
+  margin-left: 11%;
+  color: white;
+  width: 80px;
+  background-color: #11692f;
+}
+
+button:hover {
+  background-color: #189642;
+}
+
+.response {
+  width: 90px;
+  height: 50px;
+  border: 1px solid #fff;
+  border-radius: 10px;
+  padding-top: 4px;
+  margin-left: 46.2%;
+}
+
+#result {
+  margin-top: 6%;
+  margin-left: 46.6%;
+}
+
+#error {
+  color: #692724;
+  margin-top: 3%;
+  font-size: 16px;
+}
