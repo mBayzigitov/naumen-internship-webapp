@@ -189,8 +189,8 @@ public class PersonService {
     }
 
     @Transactional(readOnly = true)
-    public Person getOldestPerson() {
-        return personRepository.findTopByOrderByAgeDesc().orElse(null);
+    public List<Person> getOldestPeople() {
+        return personRepository.findOldestPeople();
     }
 
 }

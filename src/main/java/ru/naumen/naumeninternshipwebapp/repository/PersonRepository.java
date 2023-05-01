@@ -23,5 +23,9 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     )
     public Integer getRequestsAmount();
 
-    public Optional<Person> findTopByOrderByAgeDesc();
+    @Query(
+            value = "select * from Person where age = (select max(age) from Person)",
+            nativeQuery = true
+    )
+    public List<Person> findOldestPeople();
 }

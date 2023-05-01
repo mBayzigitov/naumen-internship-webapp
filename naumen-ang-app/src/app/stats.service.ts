@@ -22,7 +22,7 @@ export class StatsService {
     return this.http.get<PersonStats[]>(this.getStatURL);
   }
 
-  getOldestPerson() {
-    return this.http.get<Person>(this.getOldestURL);
+  getOldestPeople() {
+    return this.http.get<Person[]>(this.getOldestURL);
   }
 }

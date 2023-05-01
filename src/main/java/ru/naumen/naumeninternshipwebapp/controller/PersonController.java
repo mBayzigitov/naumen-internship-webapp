@@ -65,8 +65,8 @@ public class PersonController {
     }
 
     @GetMapping("oldest")
-    public Person getOldestPerson() {
-        return personService.getOldestPerson();
+    public List<Person> getOldestPeople() {
+        return personService.getOldestPeople();
     }
 
 }

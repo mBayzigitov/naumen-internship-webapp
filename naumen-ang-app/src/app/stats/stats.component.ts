@@ -11,7 +11,7 @@ import {Person} from "../person";
 export class StatsComponent {
 
   peopleStat!: PersonStats[];
-  oldest!: Person;
+  oldestPeople: Person[] = null;
   requestsAmount: number = 0;
 
   constructor(private statsService: StatsService) {}
@@ -37,9 +37,9 @@ export class StatsComponent {
   }
 
   private getOldestPerson() {
-    this.statsService.getOldestPerson().subscribe(
-      (person) => {
-        this.oldest = person;
+    this.statsService.getOldestPeople().subscribe(
+      (people) => {
+        this.oldestPeople = people;
       }
     )
   }

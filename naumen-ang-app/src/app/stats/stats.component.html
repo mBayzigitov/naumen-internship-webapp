@@ -1,7 +1,7 @@
 <h1 class="text-center">Статистика</h1>
 
-<h3 class="text-center" *ngIf="oldest">1. Имя человека с наибольшим возрастом: <span>{{oldest.name}}</span></h3>
-<h3 class="text-center" *ngIf="!oldest">1. Пока что не добавлено ни одного человека</h3>
+<h3 class="text-center" *ngIf="oldestPeople.length != 0">1. Имена людей с наибольшим возрастом: <span *ngFor="let oldPerson of oldestPeople">{{oldPerson.name}} </span></h3>
+<h3 class="text-center" *ngIf="oldestPeople.length == 0">1. Пока что не добавлено ни одного человека</h3>
 
 <h3 class="text-center" *ngIf="requestsAmount != null">2. Всего запросов: {{requestsAmount}}</h3>
 <table class="table table-dark" *ngIf="peopleStat">
