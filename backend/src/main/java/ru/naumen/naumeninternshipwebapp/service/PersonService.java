@@ -33,13 +33,77 @@ public class PersonService {
         this.personRepository = personRepository;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////
+    // <------------------------ REPOSITORY ACCESS METHODS ------------------------>
+    ////////////////////////////////////////////////////////////////////////////////////
+
     @Transactional(readOnly = true)
     public List<Person> listPeople() {
         return personRepository.findAllByOrderByName();
     }
 
+    @Transactional
+    public Person save(Person person) {
+        return personRepository.save(person);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Person> getPersonByNameFromRepository(String name) {
+        return personRepository.getPersonByName(name);
+    }
+
+    @Transactional
+    public void deleteAll() {
+        personRepository.deleteAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Person> getOldestPeople() {
+        return personRepository.findOldestPeople();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Person> findAllByOrderByCountDesc() {
+        return personRepository.findAllByOrderByCountDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public Integer getRequestsAmount() {
+        return personRepository.getRequestsAmount();
+    }
+
+    @Transactional(readOnly = true)
+    public int getPeopleRequestsAmount() {
+        Integer amount = personRepository.getRequestsAmount();
+
+        return (amount == null) ?
+                0 : amount;
+    }
+    // <------------------------------------------------------------------------>
+
+
+    ///////////////////////////////////////////////////////////////////////
+    // <------------------------ COMMON LOGIC ------------------------>
+    ///////////////////////////////////////////////////////////////////////
     public ResponseEntity<String> addPeopleViaFile(MultipartFile file) {
         Scanner scanner;
+
+        /* 1. (^|s+)
+              This is the beginning of the regular expression and it matches either
+              the start of a string or one or more whitespace characters at the
+              beginning of a string. The parentheses indicate that this is a capturing group.
+           2. ([A-ZА-ЯЁ][a-zа-яё]+)
+              This matches a word that starts with an uppercase letter (A-Z or А-ЯЁ in Cyrillic)
+              followed by one or more lowercase letters (a-z or а-яё in Cyrillic).
+              The parentheses indicate that this is a capturing group.
+           3. _
+            This matches an underscore character.
+           4. ([1-9]+)
+              This matches one or more digits from 1 to 9. The parentheses indicate that this is a capturing group.
+           5. ($|s+)
+              This matches either the end of a string or one or more whitespace characters at the end of a string.
+              The parentheses indicate that this is a capturing group.
+        */
         Pattern pattern = Pattern.compile("(^|\s+)([A-ZА-ЯЁ][a-zа-яё]+)_([1-9]+)($|\s+)");
         int counter = 0;
 
@@ -64,7 +128,7 @@ public class PersonService {
                         if (numericAge < 1 || numericAge > 120) {
                             continue;
                         }
-                    } catch (DataIntegrityViolationException nfe) {
+                    } catch (NumberFormatException nf_exc) {
                         continue;
                     }
 
@@ -72,10 +136,10 @@ public class PersonService {
 
                     // exception in case when such record already exists
                     try {
-                        personRepository.save(person);
+                        save(person);
                         counter++;
-                    } catch (Exception exception) {
-                        continue;
+                    } catch (DataIntegrityViolationException exception) {
+                        continue; // just skip invalid record
                     }
                 }
             }
@@ -88,27 +152,31 @@ public class PersonService {
                 new ResponseEntity<>(counter + " записи(-ей) добавлено", HttpStatus.OK);
     }
 
-    @Transactional
     public Person getPersonByName(String name) {
         name = name.trim();
 
+        /*
+              This regexp matches a word that starts with an uppercase letter (A-Z or А-ЯЁ in Cyrillic)
+              followed by one or more lowercase letters (a-z or а-яё in Cyrillic).
+              The parentheses indicate that this is a capturing group.
+         */
         String namePattern = "([A-ZА-ЯЁ][a-zа-яё]+)";
 
         if (!name.matches(namePattern)) {
             throw new NamePatternException();
         }
 
-        Optional<Person> person = personRepository.getPersonByName(name);
+        Optional<Person> person = getPersonByNameFromRepository(name);
 
         if (person.isEmpty()) {
             Person new_person = createPersonViaApi(name);
-            personRepository.save(new_person);
+            save(new_person);
             return new_person;
         }
 
         // incrementing person's count value inside Optional
         person.get().setCount(person.get().getCount() + 1);
-        personRepository.save(person.get());
+        save(person.get());
 
         return person.orElse(null);
 
@@ -120,7 +188,10 @@ public class PersonService {
         int newPerson_age;
         RestTemplate restTemplate = new RestTemplate();
 
-        // using api.agify.io interface
+        /*
+            Using api.agify.io interface. This service responses with null age when sending cyrillic name
+            so in order to recieve valid responses from api I use transliteration with Iuliia lib.
+        */
         String url = requestURL + translator.translate(name);
         Person new_person;
 
@@ -145,31 +216,21 @@ public class PersonService {
                 (int) ((Math.random() * (120 - 1)) + 1)); // creating random age value between 1 and 120
     }
 
-    @Transactional
-    public void deleteAll() {
-        personRepository.deleteAll();
-    }
-
-    @Transactional(readOnly = true)
-    public int getPersonsRequestsAmount() {
-        Integer amount = personRepository.getRequestsAmount();
-
-        return (amount == null) ?
-                0 : amount;
-    }
-
-    @Transactional(readOnly = true)
     public ResponseEntity<Object> getPeopleRequestsFreq() {
-        List<Person> people = personRepository.findAllByOrderByCountDesc();
-        Integer numberOfRequests = personRepository.getRequestsAmount();
+        List<Person> people = findAllByOrderByCountDesc();
+        int numberOfRequests = getPeopleRequestsAmount();
+
+        if (numberOfRequests == 0) numberOfRequests = 1; // avoiding division by zero
 
         List<Map<String, String>> data = new ArrayList<>();
 
         try {
-            if (people.isEmpty()
-                    || numberOfRequests == null
-                    || numberOfRequests == 0) return new ResponseEntity<>(data, HttpStatus.OK);
+            if (people.isEmpty()) return new ResponseEntity<>(data, HttpStatus.OK);
 
+            /*
+            this creates json with fields 'name', 'amount' and 'freq' for further
+            serialization in PersonStats TS object
+             */
             for (int i = 0; i < people.size(); i++) {
                 data.add(new HashMap<>());
                 data.get(i).put("name", people.get(i).getName());
@@ -186,11 +247,6 @@ public class PersonService {
         }
 
         return new ResponseEntity<>(data, HttpStatus.OK);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Person> getOldestPeople() {
-        return personRepository.findOldestPeople();
     }
 
 }

@@ -34,8 +34,12 @@ export class UploadPageComponent implements OnInit {
         this.error = null;
       },
       (error) => {
-        this.error = error.error;
         this.message = null;
+        if (error.error instanceof ProgressEvent) {
+          this.error = 'Выбранный файл был изменён. Загрузите его снова или выберите другой';
+        } else {
+          this.error = error.error;
+        }
       }
     );
   }

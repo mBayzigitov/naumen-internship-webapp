@@ -26,7 +26,8 @@ export class PeopleListComponent {
 
   clear() {
     if (confirm("Вы действительно хотите удалить все записи?")) {
-      if (this.personService.clearPeopleList()) this.ngOnInit();
+      this.personService.clearPeopleList();
+      this.ngOnInit();
     }
   }
 }

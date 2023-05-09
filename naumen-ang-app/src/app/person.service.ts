@@ -17,12 +17,11 @@ export class PersonService {
     return this.httpClient.get<Person[]>(this.baseURL + "people");
   }
 
-  clearPeopleList(): boolean {
+  clearPeopleList() {
     this.httpClient.delete(this.baseURL + "clear", {responseType: "text"}).subscribe(
       (response) => {
         this.status = response;
       }
     );
-    return true;
   }
 }
